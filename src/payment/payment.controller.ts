@@ -7,11 +7,6 @@ import { Order } from './types/order.types'
 export class PaymentController {
     constructor(private readonly paymentService: PaymentService) {}
 
-    // @MessagePattern('payment:create', Transport.TCP)
-    // create(@Body() order: Order) {
-    //     return this.paymentService.create(order)
-    // }
-
     @EventPattern('payment:create', Transport.TCP)
     create(@Body() order: Order) {
         return this.paymentService.create(order)

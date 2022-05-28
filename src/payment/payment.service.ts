@@ -8,15 +8,23 @@ export class PaymentService {
         @Inject('GATEWAY') private readonly gatewayClient: ClientProxy
     ) {}
 
-    create(order: Order) {
-        if (order.products.length > 1) {
-            /** Successful payment */
-            order.status = 'CONFIRMED'
-            this.gatewayClient.emit('payment:created', order)
-        } else {
-            /** Declined payment */
-            order.status = 'CANCELLED'
-            this.gatewayClient.emit('payment:created', order)
+    async create(order: Order) {
+        const random = Math.floor(Math.random() * 2 + 1)
+
+        const PaymentStatus = {
+            1: 'CONFIRMED',
+            2: 'CANCELLED'
         }
+        order.status = PaymentStatus[random]
+        this.gatewayClient.emit<Order>('order:updated', order)
+
+        if (order.status === 'CONFIRMED') this.deliver(order)
+    }
+
+    deliver(order: Order) {
+        setTimeout(() => {
+            order.status = 'DELIVERED'
+            this.gatewayClient.emit<Order>('order:updated', order)
+        }, 5000)
     }
 }
